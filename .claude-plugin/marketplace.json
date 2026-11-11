@@ -1,0 +1,16 @@
+{
+  "name": "delivery-kit",
+  "owner": {
+    "name": "phase1912"
+  },
+  "metadata": {
+    "description": "Skills and agents that put Claude Code's work on rails, from one fix to a whole MVP."
+  },
+  "plugins": [
+    {
+      "name": "delivery-kit",
+      "source": "./",
+      "description": "Work on rails: one feature or fix, or a whole MVP from a design — ask, plan, build, verify, ship."
+    }
+  ]
+}
