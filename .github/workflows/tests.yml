@@ -1,0 +1,24 @@
+name: tests
+
+# The inventory check's tests and the plugin manifests, on every push to main and every pull request.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: inventory check tests
+        run: |
+          pip install pyyaml==6.0.3 pytest
+          python -m pytest -q scripts/tests
+      - name: manifests are valid JSON
+        run: |
+          python -m json.tool .claude-plugin/plugin.json > /dev/null
+          python -m json.tool .claude-plugin/marketplace.json > /dev/null
