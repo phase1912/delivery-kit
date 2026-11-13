@@ -1,14 +1,18 @@
 #!/usr/bin/env python3
-"""Check an MVP's inventory: what the design draws, what is built, tested and reviewed.
+"""Check an MVP's inventory or requirements: what is asked, built, tested and reviewed.
 
 The mvp skills list every screen, state and control of a design in
 `docs/mvp/<name>/inventory/<SCREEN-ID>.yaml` before code is written. This keeps the list
 honest: no item without a decision, no cut without the owner, no control called verified
 without a browser test that names it, and — with --strict, before a feature or the MVP
 is said to match the design — nothing built left unverified and no screen unreviewed.
+Without a design the same files hold requirements: an area names its `source:` instead
+of a board, and its `rule` items need a test naming them like controls do.
 
     check_inventory.py docs/mvp/planner/inventory
     check_inventory.py --strict --screens LP-CAL,LP-CALSHEET docs/mvp/planner/inventory
+    check_inventory.py docs/mvp/planner/inventory docs/mvp/planner/requirements
+    check_inventory.py --strict --items BP-FAM-01,BP-FAM-02 docs/plans/<epic>/requirements
 
 Test paths are read from the project root (--root, default the current directory).
 Needs PyYAML.
@@ -25,10 +29,10 @@ from typing import Any
 
 import yaml
 
-KINDS = {"block", "control", "sheet", "state", "text"}
+KINDS = {"block", "control", "sheet", "state", "text", "rule"}
 DECISIONS = {"build", "cut", "later"}
 STATUSES = {"todo", "built", "verified", "differs"}
-TESTED_KINDS = {"control", "sheet", "state"}
+TESTED_KINDS = {"control", "sheet", "state", "rule"}
 ID = re.compile(r"^[A-Z][A-Z0-9]*(-[A-Z0-9]+)+$")
 
 
@@ -47,10 +51,11 @@ def _decision_problems(iid: str, item: dict[str, Any]) -> list[str]:
     return []
 
 
-def _test_problems(iid: str, test: object, root: Path) -> list[str]:
-    """A verified control needs a test file that names its id."""
+def _test_problems(iid: str, test: object, root: Path, kind: object) -> list[str]:
+    """A verified control or rule needs a test file that names its id."""
     if not test:
-        return [f"{iid}: verified without a browser test (test: <file>)"]
+        which = "a test" if kind == "rule" else "a browser test"
+        return [f"{iid}: verified without {which} (test: <file>)"]
     path = root / str(test).split("::")[0]
     if not path.is_file():
         return [f"{iid}: its test {test} does not exist"]
@@ -80,7 +85,7 @@ def item_problems(
     if status not in STATUSES:
         out.append(f"{iid}: status must be one of {sorted(STATUSES)}")
     if status == "verified" and item.get("kind") in TESTED_KINDS:
-        out.extend(_test_problems(iid, item.get("test"), root))
+        out.extend(_test_problems(iid, item.get("test"), root, item.get("kind")))
     if strict and item.get("decision") == "build" and status != "verified":
         out.append(f"{iid}: to be built but {status}, not verified")
     return out
@@ -95,14 +100,16 @@ def problems(
     seen: set[str] = set()
     for screen in screens:
         sid = str(screen.get("id", "?"))
-        if not screen.get("board") or not screen.get("items"):
-            out.append(f"{sid}: a screen names its design board and lists its items")
+        if not (screen.get("board") or screen.get("source")) or not screen.get("items"):
+            out.append(f"{sid}: names its design board or source and lists its items")
         for item in screen.get("items") or []:
             out.extend(item_problems(item, seen, strict, root))
             if item.get("decision") == "build":
                 counts[item.get("status", "todo")] += 1
         review = screen.get("review") or {}
-        if strict and (not review.get("at") or review.get("differences") != 0):
+        # Only a drawn screen has a design review; a requirements area is proven by tests.
+        drawn = bool(screen.get("board"))
+        if strict and drawn and (not review.get("at") or review.get("differences") != 0):
             out.append(f"{sid}: no review with zero differences")
     return out, counts
 
@@ -117,27 +124,57 @@ def load_screens(path: Path) -> list[dict[str, Any]]:
     return screens
 
 
+def select(
+    screens: list[dict[str, Any]], screen_ids: str, item_ids: str
+) -> list[dict[str, Any]]:
+    """Only the screens and, within them, the items named (by comma); empty names all.
+
+    A feature covers some items of an area that later features finish, so its strict
+    check before its commit names its own items, not the whole area.
+    """
+    if screen_ids:
+        wanted = set(screen_ids.split(","))
+        screens = [s for s in screens if s.get("id") in wanted]
+    if item_ids:
+        items = set(item_ids.split(","))
+        screens = [
+            {**s, "items": [i for i in s.get("items") or [] if i.get("id") in items]}
+            for s in screens
+        ]
+        screens = [s for s in screens if s["items"]]
+    return screens
+
+
 def main() -> int:
     """Check the inventory named; print a tally and every problem."""
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("inventory", type=Path, help="the inventory folder or a file")
+    parser.add_argument(
+        "inventory",
+        type=Path,
+        nargs="+",
+        help="inventory or requirements folders or files; ids must be unique across all",
+    )
     parser.add_argument(
         "--strict", action="store_true", help="matches the design is said"
     )
     parser.add_argument("--screens", default="", help="only these screen ids, by comma")
+    parser.add_argument("--items", default="", help="only these item ids, by comma")
     parser.add_argument(
         "--root", type=Path, default=Path.cwd(), help="the project root"
     )
     args = parser.parse_args()
-    screens = load_screens(args.inventory)
-    if args.screens:
-        wanted = set(args.screens.split(","))
-        screens = [s for s in screens if s.get("id") in wanted]
+    missing = [str(p) for p in args.inventory if not p.exists()]
+    if missing:
+        print(f"no such folder or file: {', '.join(missing)}")
+        return 2
+    screens = [s for path in args.inventory for s in load_screens(path)]
+    screens = select(screens, args.screens, args.items)
     found, counts = problems(screens, args.strict, args.root)
     tally = (
         ", ".join(f"{n} {s}" for s, n in sorted(counts.items())) or "nothing to build"
     )
-    print(f"{args.inventory}: {len(screens)} screens; to build: {tally}")
+    names = " ".join(str(p) for p in args.inventory)
+    print(f"{names}: {len(screens)} screens; to build: {tally}")
     for line in found:
         print(f"  {line}")
     return 1 if found else 0

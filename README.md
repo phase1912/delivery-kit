@@ -5,11 +5,20 @@ everything unclear up front, plans with acceptance criteria and the impact on wh
 already exists, builds, verifies with tests and with reviewers that did not build it,
 goes back to fix on any failure, and finishes with a pull request.
 
-Two entry points share the same stages:
+`feature` is the entry for any work. It sizes it into one of four levels, asking when
+unsure:
 
-- **`feature`** — one piece of work: a feature, a fix, a change ("add X", "fix Y").
-- **`mvp`** — a whole app or area from a design, epic by epic, each feature through the
-  same plan → build → verify loop, with a progress page for the person in charge.
+| Level | Plan | Parts |
+|---|---|---|
+| fix | in the issue | one commit, still reviewed |
+| feature | a plan file | one commit; steps as a checklist, never subtasks |
+| epic | an epic plan with end-to-end scenarios + a plan per feature | a commit per feature, one PR, a progress page |
+| project | → `mvp`: epics, each as above | a PR per epic, a progress page |
+
+Every level works from a written source — a design's inventory, or requirements with ids
+when there is no design — and its plan's acceptance criteria cite it. Every change is
+reviewed by an agent that did not build it. `docs/features/<area>.md` describes how each
+area works now and changes in the same commit as the behaviour.
 
 ## The rails
 
@@ -21,7 +30,7 @@ feature: size → analyse & ask → plan → build → verify → ship (pull req
                      └─ ask ◄──────────────────────┘ a decision nobody made
                      (the same failure twice → stop and ask the owner)
 
-mvp: discover (whole design → inventory, questions) → epics
+mvp: discover (a design → inventory, or requirements; questions) → epics → epic plans
      └─ per feature: plan → build → verify → commit;  per epic: pull request
 ```
 
@@ -33,15 +42,15 @@ resumes after a break or a compacted context.
 
 | Path | What |
 |---|---|
-| `skills/feature` | one piece of work on rails; the plan template |
+| `skills/feature` | the entry: levels, rails; plan templates (fix, feature, epic), the area document |
 | `skills/mvp` | MVP entry point, the stages, the state files, how to ask |
-| `skills/mvp-discover` | inventory format, asking patterns (used by `feature` too) |
+| `skills/mvp-discover` | inventory and requirements formats, asking patterns (used by `feature` too) |
 | `skills/mvp-plan` | epics, features, the feature plan with criteria and impact |
 | `skills/mvp-build` | build order, porting the design, the details checklist |
 | `skills/mvp-verify` | checks, the review loop and briefs, the progress page |
 | `agents/design-reviewer.md` | compares built screens with the design, control by control |
 | `agents/code-reviewer.md` | reviews a change: rules, impact, correctness, tests, security |
-| `scripts/check_inventory.py` | refuses an inventory that would let "matches the design" be said untrue |
+| `scripts/check_inventory.py` | refuses an inventory or requirements list that would let "done" be said untrue |
 
 ## The project's side
 

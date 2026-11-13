@@ -95,3 +95,75 @@ def test_a_folder_of_screen_files_and_a_single_file_load_alike(tmp_path: Path) -
     whole = tmp_path / "all.yml"
     whole.write_text(yaml.safe_dump({"screens": [screen()]}), encoding="utf-8")
     assert [s["id"] for s in check.load_screens(whole)] == ["LP-CAL"]
+
+
+def requirement_area(**item: Any) -> dict[str, Any]:
+    """A requirements area (no design board): one verified rule unless overridden."""
+    area = screen(kind="rule", what="an adult changes a member's products", **item)
+    del area["board"]
+    del area["review"]  # requirements have no design review
+    area["source"] = "owner, chat 2026-11-13"
+    return area
+
+
+def test_a_requirement_area_with_a_source_passes_like_a_screen() -> None:
+    found, _ = check.problems([requirement_area()], True, HERE)
+    assert found == []
+
+
+def test_a_verified_rule_needs_a_test_that_names_it() -> None:
+    found, _ = check.problems([requirement_area(test=None)], False, HERE)
+    assert found == ["LP-CAL-07: verified without a test (test: <file>)"]
+
+
+def test_an_area_without_a_board_or_a_source_is_refused() -> None:
+    area = requirement_area()
+    del area["source"]
+    found, _ = check.problems([area], False, HERE)
+    assert any("names its design board or source" in line for line in found)
+
+
+def test_a_drawn_screen_still_needs_its_design_review_in_strict() -> None:
+    drawn = screen()
+    del drawn["review"]
+    found, _ = check.problems([drawn], True, HERE)
+    assert found == ["LP-CAL: no review with zero differences"]
+
+
+def test_an_id_in_both_an_inventory_and_requirements_is_caught(tmp_path: Path) -> None:
+    (tmp_path / "inventory").mkdir()
+    (tmp_path / "requirements").mkdir()
+    (tmp_path / "inventory" / "LP-CAL.yaml").write_text(yaml.safe_dump(screen()))
+    (tmp_path / "requirements" / "LP-FAM.yaml").write_text(
+        yaml.safe_dump({**requirement_area(), "id": "LP-FAM"})
+    )
+    both = [
+        s
+        for folder in ("inventory", "requirements")
+        for s in check.load_screens(tmp_path / folder)
+    ]
+    found, _ = check.problems(both, False, HERE)
+    assert "LP-CAL-07: the id is used twice" in found
+
+
+def test_strict_on_a_feature_s_own_items_ignores_the_area_s_later_ones() -> None:
+    area = requirement_area()
+    area["items"].append({**area["items"][0], "id": "LP-CAL-08", "status": "todo"})
+    whole, _ = check.problems([area], True, HERE)
+    assert whole == ["LP-CAL-08: to be built but todo, not verified"]
+    mine, _ = check.problems(check.select([area], "", "LP-CAL-07"), True, HERE)
+    assert mine == []
+
+
+def test_main_checks_several_folders_and_names_a_missing_one(
+    tmp_path: Path, monkeypatch: Any, capsys: Any
+) -> None:
+    (tmp_path / "inventory").mkdir()
+    (tmp_path / "inventory" / "LP-CAL.yaml").write_text(yaml.safe_dump(screen()))
+    argv = ["check", str(tmp_path / "inventory"), str(tmp_path / "nope")]
+    monkeypatch.setattr(sys, "argv", argv)
+    assert check.main() == 2
+    assert "no such folder or file" in capsys.readouterr().out
+    argv = ["check", "--root", str(HERE), str(tmp_path / "inventory")]
+    monkeypatch.setattr(sys, "argv", argv)
+    assert check.main() == 0
