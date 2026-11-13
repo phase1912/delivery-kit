@@ -15,13 +15,24 @@ paths and addresses, not opinions. Ask for the report at a path outside git.
 
 > Review the code of the feature "<feature>": `git diff <base>` (uncommitted) or
 > `<base>..<head>`. Rules: <the project's rules files>, `docs/mvp/<name>/stack.md`, the
-> plan `docs/mvp/<name>/plans/<feature>.md`. Write your report to <path>.
+> plan `docs/mvp/<name>/plans/<feature>.md`, the area documents it names. Write your
+> report to <path>.
 
-## For the feature skill
+## code-reviewer — a fix
 
-Same briefs, without the inventory: the design-reviewer gets the screens the plan
-changes and the design they follow; both get the plan `docs/plans/<date>-<slug>.md`
-instead of the MVP's files, and the code-reviewer also its "Impact on what exists".
+> Review the fix in `git diff <base>`. Its plan and acceptance criteria are the issue
+> <URL> (read it with `gh issue view`). Rules: <the project's rules files>, the stack
+> file. Area document: `docs/features/<area>.md`. Write your report to <path>.
+
+## code-reviewer — a feature or an epic's feature (feature skill)
+
+> Review the code of "<feature>": `git diff <base>` or `<base>..<head>`. Plan:
+> `docs/plans/<date>-<slug>.md` (or `<epic folder>/<n>-<feature>.md`), its acceptance
+> criteria and "Impact on what exists". Rules: <the project's rules files>, the stack
+> file. Area documents: <the ones the plan names>. Write your report to <path>.
+
+The design-reviewer brief is the same as above, with the screens the plan changes and
+the design they follow instead of inventory files when there are none.
 
 ## Re-check (a fresh agent, narrow)
 

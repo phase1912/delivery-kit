@@ -10,7 +10,7 @@
     {
       "name": "delivery-kit",
       "source": "./",
-      "description": "Work on rails: one feature or fix, or a whole MVP from a design — ask, plan, build, verify, ship."
+      "description": "Work on rails, from a fix to a whole project: sized by level, planned against a design or requirements, built, verified, documented, shipped."
     }
   ]
 }

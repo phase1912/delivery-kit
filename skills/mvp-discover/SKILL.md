@@ -1,6 +1,6 @@
 ---
 name: mvp-discover
-description: Stage 1 of the mvp skill — read the whole design and the existing code, list every screen, state and control in an inventory, find everything unclear, and ask the owner until nothing product-level is left to guess. Load it when an MVP starts (from the mvp skill), or when a new design area arrives mid-way.
+description: Stage 1 of the mvp skill — read the whole design (or, without one, the owner's words, documents and code) and the existing code, list every screen, state and control in an inventory (or every behaviour as requirements with ids), find everything unclear, and ask the owner until nothing product-level is left to guess. Load it when an MVP starts (from the mvp skill), or when a new design area arrives mid-way.
 ---
 
 # Discover: the whole design, everything unclear, every answer
@@ -17,6 +17,11 @@ built in this stage.
 - Compare sources before reading them twice: two artifacts may hold the same boards.
 - Render the boards you will compare against later (a static page around the board's
   HTML is enough); a board's logic code says what its controls do.
+
+No design, or none for some epics: collect the owner's words, the documents they name
+and what the code does today instead, and write requirements for those epics
+(`references/requirements-format.md`) — same ids, decisions and check as the inventory.
+The rest of this stage applies to both.
 
 ## 2. The inventory, one file per screen
 
@@ -52,12 +57,14 @@ in a row as needed, each question naming the screen and the problem, recommendat
 with a one-line reason and a rough size (S/M/L). Patterns: `references/asking.md`.
 
 A group answer decides its items: write the decision on every item it covers
-(`decision`, `decided: owner YYYY-MM-DD`) and the behaviour into `rules/<area>.md`. Keep
+(`decision`, `decided: owner YYYY-MM-DD`) and the behaviour into `docs/features/<area>.md`
+(`../feature/references/area-doc.md`, "Rules"). Keep
 asking rounds until every `data: missing` item has a decision and no note says
 "unclear". If the owner says "you decide" for a group, decide, write it as yours, and list
 it in the progress table so it can be revisited.
 
 ## 5. Close the stage
 
-Run the kit's inventory check (`scripts/check_inventory.py docs/mvp/<name>/inventory`):
-only clean output ends the stage. Then load `mvp-plan`.
+Run the kit's check over everything written, in one run so an id is never used twice
+(`scripts/check_inventory.py docs/mvp/<name>/inventory docs/mvp/<name>/requirements`,
+whichever exist): only clean output ends the stage. Then load `mvp-plan`.
