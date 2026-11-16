@@ -5,6 +5,9 @@
 ## What the person can do
 Two or three sentences, in the product's words.
 
+## Source
+Inventory items (LP-CAL-07…) and/or requirement items (BP-FAM-03…) this covers.
+
 ## Scope
 - Covers: <item ids>.
 - Leaves for later: <item ids> — <which feature>.
@@ -12,7 +15,7 @@ Two or three sentences, in the product's words.
 ## Backend
 - Models / migrations: …
 - Routes: `METHOD /path` — who may call it, what it returns, its refusals (codes).
-- Rules: … (link `rules/<epic>.md` entries).
+- Rules: … (link `docs/features/<area>.md` entries).
 - Outside services: … (stubbed in tests at the port).
 
 ## Client
@@ -31,11 +34,20 @@ Leave a line out only when it truly does not apply; "none" needs the search that
 - Behaviour a person already relies on that changes, and whether the owner agreed.
 - Suites to run besides this feature's: the other app's, the packages', end-to-end.
 
+## Steps
+- [ ] backend and its tests · - [ ] seed · - [ ] client · - [ ] a test per criterion
+
 ## Acceptance criteria
 | # | Given | When | Then | Items |
 |---|---|---|---|---|
 | 1 | a family with two adults | the second taps + | the new-event sheet opens with today | LP-CAL-07 |
 | 2 | … | … | … | … |
 
+## Area documents
+- `docs/features/<area>.md` — what changes in it (updated in this feature's commit).
+
 ## Risks and open questions
 - …
+
+## Review
+Date, reviewers, findings fixed, re-check result.

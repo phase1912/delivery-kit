@@ -2,16 +2,20 @@
 
 One page the owner opens instead of asking "where are we". Publish it once (an Artifact,
 if the environment has them; otherwise a page in the project's docs) and update the same
-page after every feature — same file, same address.
+page at every status change of a feature (planned, building, verifying, done) — same
+file, same address. Used for an epic run by the `feature` skill too: then the top shows
+the epic, and the rest its features.
 
 ## What it shows
 
 - **Top:** the MVP's name, the design links, epics done / total, features done / total,
   and the next feature.
-- **Per epic:** its PR (link, state), its features with status, and for each done
-  feature: the acceptance criteria met, the review result (differences and findings
-  fixed), and the screens as design / app thumbnails at the phone width (wider ones on
-  click).
+- **Per epic:** its PR (link, state), its end-to-end scenarios with their state, its
+  features with status, and for each feature, on click: **its acceptance criteria
+  themselves** (given / when / then, ticked with their proof, open ones visible), the
+  review result (differences and findings fixed), and the screens as design / app
+  thumbnails at the phone width (wider ones on click). A count alone ("6 of 6") is not
+  enough: the owner checks the criteria, not the number.
 - **Decided by the owner:** cuts and laters with the date — and any group the owner left
   to you, marked so it can be revisited.
 - **Open questions** waiting for the owner, if any.

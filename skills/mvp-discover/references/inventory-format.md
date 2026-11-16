@@ -11,7 +11,7 @@ epic: calendar                   # filled in by mvp-plan
 review: {at: 2026-11-12, differences: 0}   # filled in by mvp-verify
 items:
   - id: LP-CAL-07
-    kind: control                # block | control | sheet | state | text
+    kind: control                # block | control | sheet | state | text | rule
     what: "+ beside the faces"
     does: "opens the new-event sheet with today's date"
     data: have                   # have | missing
@@ -30,6 +30,8 @@ items:
 - **sheet** — a sheet, dialog or menu a control opens (its own screen file when large).
 - **state** — empty, loading, error, filled, long text, offline, a role that sees less.
 - **text** — words that carry meaning (a promise, a rule, a legal line, a number's label).
+- **rule** — a behaviour the board does not draw (who may, a limit, an error); tested like
+  a control.
 
 Write `does` as the observable result: what opens, what changes on screen, what is saved
 (it is still there after a reload), where it navigates, what the refusal says. Motion

@@ -34,7 +34,7 @@ screen and again before you hand the feature to `mvp-verify`.
 
 Stop and ask the owner (the `mvp` skill's way of asking) the moment a criterion, a
 control or a state is not decided by the design, the rules or the plan. Write the answer
-into `rules/<epic>.md`, then go on. Do not build around the gap. Do not cut an item,
+into `docs/features/<area>.md`, then go on. Do not build around the gap. Do not cut an item,
 fake its data or leave a control dead because it is hard; ask.
 
 ## Done building

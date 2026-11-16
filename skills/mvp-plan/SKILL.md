@@ -20,6 +20,12 @@ Write them into `state.yaml`: name, screens, order, the branch `feature/<name>-<
 and, later, its PR. Each epic becomes one pull request; each feature inside, one commit.
 Show the owner the list in one message and adjust if they reorder.
 
+When an epic starts, write its plan `plans/epic-<n>-<slug>.md` from
+`../feature/references/epic-plan.md`: what a person gets, its source (inventory screens
+or requirement areas), its features in order, and 3–6 **end-to-end scenarios** that
+cross its features — the epic's acceptance criteria, run as browser tests (API tests
+when the epic has no screen) before its PR.
+
 ## Features (when the epic starts)
 
 Cut the epic into features of a sensible size: one screen with its sheets, or one flow
@@ -29,7 +35,7 @@ enough that one review can hold it, big enough to be worth a commit. List them i
 
 ## A feature's plan (when it is next)
 
-Before building, read only the feature's screen files, its epic's `rules/` and the code
+Before building, read only the feature's screen files, its area documents (`docs/features/`, and an older `rules/` where one exists) and the code
 it touches; then write `plans/<feature>.md` from `references/feature-plan.md`:
 
 - what the person can do when it is done, in two or three sentences;

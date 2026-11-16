@@ -1,7 +1,7 @@
 {
   "name": "delivery-kit",
-  "version": "0.2.0",
-  "description": "Work on rails for Claude Code: one feature or fix, or a whole MVP from a design. Analyse and ask everything unclear up front, plan with acceptance criteria and impact on what exists, build, verify with tests and reviewers that did not build it, loop back on any failure, and finish with a pull request.",
+  "version": "0.3.0",
+  "description": "Work on rails for Claude Code, from a fix to a whole project: sized by level, planned against a written source (a design or requirements) with acceptance criteria and impact, built, verified by tests and reviewers that did not build it, documented per area, and shipped as a pull request.",
   "author": {
     "name": "phase1912"
   }
